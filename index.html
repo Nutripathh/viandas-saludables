@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nutripath Viandas | Comida Saludable Lista</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --verde-oscuro:#3f5a4d; --verde-medio:#7a9b8a; --verde-claro:#e8efe9;
+    --crema:#faf8f4; --texto:#2c332e; --texto-suave:#5f6b64; --blanco:#fffefb;
+    --borde:#dbe3dd; --mostaza:#c9a95e;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Inter',sans-serif;color:var(--texto);background:var(--crema);}
+  h1,h2,h3{font-family:'Fraunces',serif;line-height:1.1;}
+  a{text-decoration:none;color:inherit;} ul{list-style:none;} img{max-width:100%;display:block;}
+  button{font-family:inherit;cursor:pointer;}
+
+  /* LAYOUT PRINCIPAL: sidebar fija + contenido tipo menú */
+  .app{display:grid;grid-template-columns:380px 1fr;min-height:100vh;}
+  .sidebar{
+    background:var(--verde-oscuro);color:#fff;padding:48px 40px;
+    position:sticky;top:0;height:100vh;display:flex;flex-direction:column;
+  }
+  .sidebar .logo{font-size:1.8rem;font-weight:700;margin-bottom:6px;}
+  .sidebar .tagline{color:var(--mostaza);font-size:.85rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:36px;}
+  .sidebar h1{font-size:1.9rem;font-style:italic;font-weight:500;margin-bottom:18px;color:#fff;}
+  .sidebar p{color:#dbe6de;font-size:.95rem;margin-bottom:auto;padding-bottom:24px;}
+  .sidebar-nav{display:flex;flex-direction:column;gap:2px;border-top:1px solid rgba(255,255,255,.2);padding-top:20px;}
+  .sidebar-nav a{font-size:.85rem;font-weight:600;color:#dbe6de;padding:8px 0;}
+  .sidebar-nav a:hover{color:var(--mostaza);}
+  .sidebar-footer{margin-top:24px;font-size:.78rem;color:#a9c1b6;}
+
+  .contenido{padding:56px 60px;}
+  .encabezado-menu{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--verde-oscuro);padding-bottom:18px;margin-bottom:8px;}
+  .encabezado-menu h2{font-size:2.3rem;color:var(--verde-oscuro);font-weight:700;}
+  .encabezado-menu span{color:var(--texto-suave);font-size:.9rem;}
+
+  /* ITEMS estilo menú de restaurante, sin cards con imagen grande */
+  .item-menu{
+    display:flex;gap:20px;align-items:center;padding:22px 0;border-bottom:1px dashed var(--borde);
+  }
+  .item-thumb{width:76px;height:76px;border-radius:8px;overflow:hidden;flex-shrink:0;background:var(--verde-claro);}
+  .item-thumb img{width:100%;height:100%;object-fit:cover;}
+  .item-info{flex:1;}
+  .item-info h3{font-size:1.15rem;font-weight:700;font-family:'Inter',sans-serif;margin-bottom:4px;color:var(--texto);}
+  .item-info p{color:var(--texto-suave);font-size:.88rem;}
+  .item-tag{display:inline-block;background:var(--verde-claro);color:var(--verde-oscuro);font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:100px;margin-bottom:6px;}
+  .item-precio{font-family:'Fraunces',serif;font-weight:700;font-size:1.3rem;color:var(--verde-oscuro);min-width:80px;text-align:right;}
+  .item-add{
+    width:38px;height:38px;border-radius:50%;border:2px solid var(--verde-oscuro);color:var(--verde-oscuro);
+    background:none;font-size:1.3rem;flex-shrink:0;
+  }
+  .item-add:hover{background:var(--verde-oscuro);color:#fff;}
+
+  .categoria-titulo{font-size:.8rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--verde-medio);font-weight:700;margin:40px 0 4px;}
+
+  #proceso{margin-top:60px;background:var(--verde-claro);border-radius:16px;padding:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:30px;}
+  #proceso .paso{}
+  #proceso .numero{font-family:'Fraunces',serif;font-weight:700;font-size:1.5rem;color:var(--verde-oscuro);}
+  #proceso h3{font-size:1rem;margin:6px 0 4px;color:var(--texto);}
+  #proceso p{font-size:.85rem;color:var(--texto-suave);}
+
+  #contacto{margin-top:50px;text-align:center;padding:40px 0 10px;}
+  #contacto h2{font-size:1.6rem;color:var(--verde-oscuro);margin-bottom:8px;}
+  #contacto p{color:var(--texto-suave);margin-bottom:20px;}
+  .accesos-rapidos{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+  .acceso-rapido{background:var(--verde-oscuro);color:#fff;font-weight:600;padding:12px 24px;border-radius:100px;font-size:.88rem;}
+  .acceso-rapido.wsp{background:#25D366;}
+  .acceso-rapido.ig{background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);}
+
+  /* CARRITO lateral (drawer) */
+  .carrito-flotante{
+    position:fixed;bottom:28px;right:28px;background:var(--verde-oscuro);color:#fff;
+    padding:14px 22px;border-radius:100px;font-weight:700;font-size:.9rem;display:flex;gap:8px;align-items:center;
+    box-shadow:0 6px 20px rgba(0,0,0,.2);border:none;z-index:150;
+  }
+  .cart-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;}
+  .cart-overlay.abierto{display:block;}
+  .cart-drawer{position:fixed;top:0;right:0;height:100%;width:340px;max-width:90%;background:#fff;z-index:201;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;}
+  .cart-drawer.abierto{transform:translateX(0);}
+  .cart-header{padding:18px 20px;border-bottom:1px solid var(--borde);display:flex;justify-content:space-between;align-items:center;}
+  .cart-header h3{font-size:1.05rem;font-family:'Inter',sans-serif;font-weight:700;}
+  .cart-header button{background:none;font-size:1.3rem;color:var(--texto-suave);border:none;}
+  .cart-body{flex:1;overflow-y:auto;padding:16px 20px;}
+  .cart-item{display:flex;gap:12px;margin-bottom:16px;align-items:center;}
+  .cart-item img{width:52px;height:52px;object-fit:cover;border-radius:8px;background:var(--verde-claro);}
+  .cart-item-info{flex:1;}
+  .cart-item-info p{font-size:.82rem;margin-bottom:2px;}
+  .cart-item-info span{font-size:.8rem;color:var(--texto-suave);}
+  .cart-footer{padding:18px 20px;border-top:1px solid var(--borde);}
+  .cart-total{display:flex;justify-content:space-between;font-weight:700;margin-bottom:14px;}
+  .cart-vacio{color:var(--texto-suave);font-size:.85rem;text-align:center;margin-top:30px;}
+  .btn-finalizar{width:100%;background:var(--verde-oscuro);color:#fff;padding:12px;border-radius:100px;font-weight:700;font-size:.9rem;border:none;}
+
+  @media(max-width:900px){
+    .app{grid-template-columns:1fr;}
+    .sidebar{position:relative;height:auto;padding:36px 24px;}
+    .sidebar p{margin-bottom:20px;}
+    .contenido{padding:36px 20px;}
+    #proceso{grid-template-columns:1fr;}
+    .item-menu{flex-wrap:wrap;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ===== SIDEBAR FIJA ===== -->
+  <aside class="sidebar">
+    <div>
+      <div class="logo">Nutripath</div>
+      <div class="tagline">Viandas saludables</div>
+      <h1>Comida real,<br>lista para vos</h1>
+      <p>Viandas preparadas por nutricionistas, armadas con porciones controladas e ingredientes frescos. Elegí tu menú de la semana.</p>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#detox">Detox</a>
+      <a href="#proteina">Alta en proteína</a>
+      <a href="#vegetariana">Vegetariana</a>
+      <a href="#familiar">Familiar</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <div class="sidebar-footer">© 2026 Nutripath Viandas</div>
+  </aside>
+
+  <!-- ===== CONTENIDO: MENÚ ESTILO CARTA ===== -->
+  <main class="contenido">
+    <div class="encabezado-menu">
+      <h2>El menú</h2>
+      <span>Actualizado cada semana</span>
+    </div>
+
+    <div class="categoria-titulo" id="detox">Detox</div>
+    <div class="item-menu">
+      <div class="item-thumb"><img src="https://images.unsplash.com/photo-1666819691666-4be36926335e?w=200&q=80&auto=format&fit=crop" alt="Vianda Detox"></div>
+      <div class="item-info">
+        <span class="item-tag">5 días</span>
+        <h3>Vianda Detox</h3>
+        <p>Comidas livianas ricas en fibra y antioxidantes.</p>
+      </div>
+      <div class="item-precio">$4.500</div>
+      <button class="item-add" onclick="agregarCarrito('Vianda Detox','$4.500','https://images.unsplash.com/photo-1666819691666-4be36926335e?w=100&q=80&auto=format&fit=crop')">+</button>
+    </div>
+
+    <div class="categoria-titulo" id="proteina">Alta en proteína</div>
+    <div class="item-menu">
+      <div class="item-thumb"><img src="https://images.unsplash.com/photo-1543353071-c953d88f7033?w=200&q=80&auto=format&fit=crop" alt="Vianda Alta en Proteína"></div>
+      <div class="item-info">
+        <span class="item-tag">5 almuerzos</span>
+        <h3>Alta en Proteína</h3>
+        <p>Pensada para acompañar tu entrenamiento semanal.</p>
+      </div>
+      <div class="item-precio">$5.900</div>
+      <button class="item-add" onclick="agregarCarrito('Alta en Proteína','$5.900','https://images.unsplash.com/photo-1543353071-c953d88f7033?w=100&q=80&auto=format&fit=crop')">+</button>
+    </div>
+
+    <div class="categoria-titulo" id="vegetariana">Vegetariana</div>
+    <div class="item-menu">
+      <div class="item-thumb"><img src="https://images.unsplash.com/photo-1606858374191-c18040e98ad7?w=200&q=80&auto=format&fit=crop" alt="Vianda Vegetariana"></div>
+      <div class="item-info">
+        <span class="item-tag">Sin carne</span>
+        <h3>Vegetariana</h3>
+        <p>Platos completos sin carne, listos para comer.</p>
+      </div>
+      <div class="item-precio">$4.900</div>
+      <button class="item-add" onclick="agregarCarrito('Vegetariana','$4.900','https://images.unsplash.com/photo-1606858374191-c18040e98ad7?w=100&q=80&auto=format&fit=crop')">+</button>
+    </div>
+
+    <div class="categoria-titulo" id="familiar">Familiar</div>
+    <div class="item-menu">
+      <div class="item-thumb"><img src="https://images.unsplash.com/photo-1609915437016-85693e56470f?w=200&q=80&auto=format&fit=crop" alt="Vianda Familiar"></div>
+      <div class="item-info">
+        <span class="item-tag">5 días</span>
+        <h3>Familiar Semanal</h3>
+        <p>Menú completo para toda la familia.</p>
+      </div>
+      <div class="item-precio">$6.500</div>
+      <button class="item-add" onclick="agregarCarrito('Familiar Semanal','$6.500','https://images.unsplash.com/photo-1609915437016-85693e56470f?w=100&q=80&auto=format&fit=crop')">+</button>
+    </div>
+
+    <!-- ===== PROCESO ===== -->
+    <section id="proceso">
+      <div class="paso"><div class="numero">01</div><h3>Diseñamos</h3><p>Armamos el menú semanal con criterio nutricional real.</p></div>
+      <div class="paso"><div class="numero">02</div><h3>Cocinamos</h3><p>Preparamos cada vianda el mismo día de entrega.</p></div>
+      <div class="paso"><div class="numero">03</div><h3>Entregamos</h3><p>Llega fresca a tu casa, lista para calentar.</p></div>
+    </section>
+
+    <!-- ===== CONTACTO ===== -->
+    <section id="contacto">
+      <h2>¿Querés tu vianda semanal?</h2>
+      <p>Escribinos y coordinamos la entrega en tu zona.</p>
+      <div class="accesos-rapidos">
+        <!-- Reemplazá el número de WhatsApp -->
+        <a class="acceso-rapido wsp" href="https://wa.me/5491122702187" target="_blank" rel="noopener">📱 WhatsApp</a>
+        <!-- Reemplazá tu usuario de Instagram -->
+        <a class="acceso-rapido ig" href="https://instagram.com/guillee_ggg" target="_blank" rel="noopener">📷 Instagram</a>
+      </div>
+    </section>
+  </main>
+
+</div>
+
+<!-- ===== CARRITO ===== -->
+<button class="carrito-flotante" id="abrirCarrito">🛒 Mi pedido (<span id="cartCount">0</span>)</button>
+<div class="cart-overlay" id="cartOverlay" onclick="cerrarCarrito()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h3>Mi pedido</h3>
+    <button onclick="cerrarCarrito()">✕</button>
+  </div>
+  <div class="cart-body" id="cartBody">
+    <p class="cart-vacio">Todavía no agregaste viandas</p>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total"><span>Total</span><span id="cartTotal">$0</span></div>
+    <button class="btn-finalizar" onclick="finalizarCompra()">Finalizar pedido</button>
+  </div>
+</div>
+
+<script>
+  let carrito = [];
+  function formatearPrecio(n){ return '$' + n.toLocaleString('es-AR'); }
+  function parsearPrecio(str){ return parseInt(str.replace(/[^0-9]/g,''),10); }
+
+  function agregarCarrito(nombre, precio, img){
+    carrito.push({nombre, precio, img});
+    actualizarCarrito();
+    abrirCarrito();
+  }
+  function actualizarCarrito(){
+    document.getElementById('cartCount').textContent = carrito.length;
+    const body = document.getElementById('cartBody');
+    body.innerHTML = carrito.length === 0
+      ? '<p class="cart-vacio">Todavía no agregaste viandas</p>'
+      : carrito.map(item => `
+        <div class="cart-item">
+          <img src="${item.img}" alt="${item.nombre}">
+          <div class="cart-item-info"><p>${item.nombre}</p><span>${item.precio}</span></div>
+        </div>`).join('');
+    const total = carrito.reduce((acc, item) => acc + parsearPrecio(item.precio), 0);
+    document.getElementById('cartTotal').textContent = formatearPrecio(total);
+  }
+  function abrirCarrito(){
+    document.getElementById('cartDrawer').classList.add('abierto');
+    document.getElementById('cartOverlay').classList.add('abierto');
+  }
+  function cerrarCarrito(){
+    document.getElementById('cartDrawer').classList.remove('abierto');
+    document.getElementById('cartOverlay').classList.remove('abierto');
+  }
+  function finalizarCompra(){
+    if(carrito.length === 0){ return; }
+    // Acá podés conectar el envío real a WhatsApp o a tu pasarela de pago
+    alert('✅ ¡Compra exitosa! En breve nos comunicamos para coordinar la entrega.');
+    carrito = [];
+    actualizarCarrito();
+    cerrarCarrito();
+  }
+  document.getElementById('abrirCarrito').addEventListener('click', abrirCarrito);
+</script>
+
+</body>
+</html>
